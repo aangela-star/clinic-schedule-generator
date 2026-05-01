@@ -1,117 +1,190 @@
-const DAYS = ["週一", "週二", "週三", "週四", "週五", "週六"];
-const SLOTS = [
-  { key: "早診", label: "早診\n8:30-11:30" },
-  { key: "午診", label: "午診\n14:30-17:30" },
-  { key: "晚診", label: "晚診\n18:30-20:30" },
-];
+// 門診表產生器：所有資料都在前端操作，不需要修改 JSON 或程式碼。
+const days = ["週一", "週二", "週三", "週四", "週五", "週六"];
+const sessions = ["早診", "午診", "晚診"];
 
-const DOCTOR_COLOR_MAP = {
-  劉晉瑋: "var(--doctor-liu)",
-  莊逸玟: "var(--doctor-zhuang)",
-  王文達: "var(--doctor-wang)",
-  薛琇方: "var(--doctor-xue)",
-  蔡玉麟: "var(--doctor-cai)",
-  輪班: "var(--doctor-shift)",
+const state = {
+  title: "115年4月 醫師門診時段表",
+  clinics: [
+    {
+      name: "毅安診所",
+      schedule: [
+        ["劉晉瑋", "莊逸玟", "薛琇方", "莊逸玟", "劉晉瑋", "輪班"],
+        ["莊逸玟", "劉晉瑋", "莊逸玟", "王文達", "劉晉瑋", "輪班"],
+        ["劉晉瑋", "薛琇方", "王文達", "王文達", "莊逸玟", "輪班"]
+      ]
+    },
+    {
+      name: "晉安診所",
+      schedule: [
+        ["薛琇方", "薛琇方", "劉晉瑋", "劉晉瑋", "薛琇方", "輪班"],
+        ["劉晉瑋", "王文達", "王文達", "蔡玉麟", "莊逸玟", "輪班"],
+        ["莊逸玟", "王文達", "莊逸玟", "蔡玉麟", "劉晉瑋", "輪班"]
+      ]
+    }
+  ],
+  changes: "4/3（四）早診：劉晉瑋 → 王文達\n4/5（六）午診：停診",
+  note: "● 黑點表示該時段無醫師看診　請於門診前五分鐘報到"
 };
 
-async function loadSchedule() {
-  const response = await fetch("./data/schedule.json", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("無法讀取班表資料");
-  }
+const colorMap = {
+  "劉晉瑋": "doctor-liu",
+  "莊逸玟": "doctor-chuang",
+  "王文達": "doctor-wang",
+  "薛琇方": "doctor-hsueh",
+  "蔡玉麟": "doctor-tsai",
+  "輪班": "doctor-rotation",
+  "停診": "doctor-closed"
+};
 
-  return response.json();
-}
+const titleInput = document.getElementById("titleInput");
+const clinicsEditor = document.getElementById("clinicsEditor");
+const changesInput = document.getElementById("changesInput");
+const noteInput = document.getElementById("noteInput");
+const downloadBtn = document.getElementById("downloadBtn");
 
-function createClinicCard(clinic) {
-  const card = document.createElement("section");
-  card.className = "clinic-card";
+const posterTitle = document.getElementById("posterTitle");
+const posterClinics = document.getElementById("posterClinics");
+const posterChanges = document.getElementById("posterChanges");
+const posterNote = document.getElementById("posterNote");
 
-  const header = document.createElement("div");
-  header.className = `clinic-header theme-${clinic.theme}`;
-  header.textContent = clinic.name;
+function buildEditor() {
+  clinicsEditor.innerHTML = "";
 
-  const table = document.createElement("table");
-  table.className = "clinic-table";
+  state.clinics.forEach((clinic, clinicIndex) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "clinic-editor";
 
-  const thead = document.createElement("thead");
-  thead.innerHTML = `
-    <tr>
-      <th>時段 / 星期</th>
-      ${DAYS.map((day) => `<th>${day}</th>`).join("")}
-    </tr>
-  `;
-
-  const tbody = document.createElement("tbody");
-
-  SLOTS.forEach((slot) => {
-    const tr = document.createElement("tr");
-
-    const slotHeader = document.createElement("th");
-    slotHeader.innerText = slot.label;
-    tr.appendChild(slotHeader);
-
-    DAYS.forEach((day) => {
-      const td = document.createElement("td");
-      const doctor = clinic.schedule?.[day]?.[slot.key] ?? "●";
-
-      const span = document.createElement("span");
-      span.className = doctor === "●" ? "doctor-empty" : "doctor-name";
-      span.textContent = doctor;
-      span.style.color = DOCTOR_COLOR_MAP[doctor] ?? "#111827";
-
-      td.appendChild(span);
-      tr.appendChild(td);
+    const nameInput = document.createElement("input");
+    nameInput.className = "clinic-name";
+    nameInput.value = clinic.name;
+    nameInput.addEventListener("input", (e) => {
+      state.clinics[clinicIndex].name = e.target.value;
+      renderPoster();
     });
 
-    tbody.appendChild(tr);
-  });
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    headRow.innerHTML = `<th>時段</th>${days.map((d) => `<th>${d}</th>`).join("")}`;
+    thead.appendChild(headRow);
 
-  table.append(thead, tbody);
-  card.append(header, table);
-  return card;
+    const tbody = document.createElement("tbody");
+    sessions.forEach((sessionName, rowIndex) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<th>${sessionName}</th>`;
+
+      days.forEach((_, colIndex) => {
+        const td = document.createElement("td");
+        const input = document.createElement("input");
+        input.value = clinic.schedule[rowIndex][colIndex] ?? "";
+        input.addEventListener("input", (e) => {
+          state.clinics[clinicIndex].schedule[rowIndex][colIndex] = e.target.value.trim();
+          renderPoster();
+        });
+        td.appendChild(input);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.append(thead, tbody);
+    wrapper.append(nameInput, table);
+    clinicsEditor.appendChild(wrapper);
+  });
 }
 
-function renderPoster(data) {
-  document.getElementById("poster-title").textContent = data.title;
-  document.getElementById("poster-note").textContent = data.note;
+function doctorClass(name) {
+  return colorMap[name] ?? "";
+}
 
-  const clinicsContainer = document.getElementById("clinics-container");
-  clinicsContainer.innerHTML = "";
-  data.clinics.forEach((clinic) => clinicsContainer.appendChild(createClinicCard(clinic)));
+function renderPoster() {
+  posterTitle.textContent = state.title || "門診時段表";
+  posterChanges.textContent = state.changes;
+  posterNote.textContent = state.note;
+  posterClinics.innerHTML = "";
 
-  const changesList = document.getElementById("changes-list");
-  changesList.innerHTML = "";
-  data.changes.forEach((text) => {
-    const li = document.createElement("li");
-    li.textContent = text;
-    changesList.appendChild(li);
+  state.clinics.forEach((clinic) => {
+    const card = document.createElement("section");
+    card.className = "clinic-card";
+
+    const h4 = document.createElement("h4");
+    h4.textContent = clinic.name || "未命名診所";
+
+    const table = document.createElement("table");
+    table.className = "poster-table";
+    const thead = document.createElement("thead");
+    thead.innerHTML = `<tr><th>時段</th>${days.map((d) => `<th>${d}</th>`).join("")}</tr>`;
+
+    const tbody = document.createElement("tbody");
+    sessions.forEach((sessionName, rowIndex) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<th>${sessionName}</th>`;
+
+      days.forEach((_, colIndex) => {
+        const td = document.createElement("td");
+        const value = clinic.schedule[rowIndex][colIndex] || "";
+        const span = document.createElement("span");
+        span.textContent = value;
+        span.className = doctorClass(value);
+        td.appendChild(span);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+
+    table.append(thead, tbody);
+    card.append(h4, table);
+    posterClinics.appendChild(card);
   });
 }
 
 async function downloadPoster() {
   const poster = document.getElementById("poster");
-  const canvas = await html2canvas(poster, {
-    backgroundColor: null,
-    scale: 2,
-    useCORS: true,
+  downloadBtn.disabled = true;
+  downloadBtn.textContent = "產生中...";
+
+  try {
+    const canvas = await html2canvas(poster, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    });
+
+    const link = document.createElement("a");
+    link.download = `${state.title || "門診時段表"}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } finally {
+    downloadBtn.disabled = false;
+    downloadBtn.textContent = "產生圖片 / 下載 PNG";
+  }
+}
+
+function bindTopInputs() {
+  titleInput.value = state.title;
+  changesInput.value = state.changes;
+  noteInput.value = state.note;
+
+  titleInput.addEventListener("input", (e) => {
+    state.title = e.target.value;
+    renderPoster();
   });
 
-  const link = document.createElement("a");
-  link.download = "115年4月_雙院區醫師門診表.png";
-  link.href = canvas.toDataURL("image/png");
-  link.click();
+  changesInput.addEventListener("input", (e) => {
+    state.changes = e.target.value;
+    renderPoster();
+  });
+
+  noteInput.addEventListener("input", (e) => {
+    state.note = e.target.value;
+    renderPoster();
+  });
+
+  downloadBtn.addEventListener("click", downloadPoster);
 }
 
-async function init() {
-  try {
-    const data = await loadSchedule();
-    renderPoster(data);
-  } catch (error) {
-    alert(`載入失敗：${error.message}`);
-  }
-
-  document.getElementById("download-btn").addEventListener("click", downloadPoster);
-}
-
-init();
+bindTopInputs();
+buildEditor();
+renderPoster();
