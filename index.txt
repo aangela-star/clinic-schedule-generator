@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>雙院區醫師門診表 HTML 圖片產生器 v1</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="controls">
+      <button id="download-btn" type="button">下載 PNG</button>
+    </div>
+
+    <main id="poster" class="poster" aria-label="雙院區醫師門診表海報">
+      <header class="poster-header">
+        <h1 id="poster-title">載入中...</h1>
+      </header>
+
+      <section id="clinics-container" class="clinics-container" aria-live="polite"></section>
+
+      <section class="changes-card">
+        <h2>🔺 本週門診異動</h2>
+        <ul id="changes-list"></ul>
+      </section>
+
+      <footer class="poster-note" id="poster-note"></footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="app.js" defer></script>
+  </body>
+</html>

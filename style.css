@@ -1,0 +1,160 @@
+:root {
+  --poster-width: 1080px;
+  --poster-height: 1920px;
+
+  --doctor-liu: #b91c1c;
+  --doctor-zhuang: #0057b8;
+  --doctor-wang: #15803d;
+  --doctor-xue: #b7791f;
+  --doctor-cai: #6b4e4e;
+  --doctor-shift: #111111;
+
+  --text-main: #1f2937;
+  --card-bg: rgba(255, 255, 255, 0.92);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  padding: 24px;
+  font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  color: var(--text-main);
+  background: linear-gradient(180deg, #edf9f8 0%, #e9f2ff 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.controls {
+  width: min(100%, var(--poster-width));
+  display: flex;
+  justify-content: flex-end;
+}
+
+#download-btn {
+  border: none;
+  background: #0f766e;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+#download-btn:hover {
+  background: #0d9488;
+}
+
+.poster {
+  width: var(--poster-width);
+  height: var(--poster-height);
+  padding: 52px;
+  background: linear-gradient(160deg, #f4fbfb 0%, #eef5ff 60%, #f7fbff 100%);
+  border-radius: 28px;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.16);
+  display: flex;
+  flex-direction: column;
+}
+
+.poster-header h1 {
+  margin: 0 0 24px;
+  font-size: 52px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.clinics-container {
+  display: grid;
+  gap: 28px;
+}
+
+.clinic-card,
+.changes-card {
+  background: var(--card-bg);
+  border-radius: 24px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+}
+
+.clinic-header {
+  padding: 20px 28px;
+  font-size: 34px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.theme-teal {
+  background: linear-gradient(90deg, #bae6e2, #d9f4f1);
+}
+
+.theme-blue {
+  background: linear-gradient(90deg, #bfdbfe, #deebff);
+}
+
+.clinic-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.clinic-table th,
+.clinic-table td {
+  border: 1px solid #dbe6ef;
+  text-align: center;
+  padding: 14px 8px;
+  font-size: 24px;
+}
+
+.clinic-table thead th {
+  background: #f4f8fd;
+  font-weight: 800;
+}
+
+.clinic-table tbody th {
+  background: #f8fbff;
+  font-size: 22px;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.doctor-name {
+  font-weight: 800;
+}
+
+.doctor-empty {
+  color: #475569;
+  font-weight: 800;
+}
+
+.changes-card {
+  margin-top: 30px;
+  padding: 24px 30px;
+}
+
+.changes-card h2 {
+  margin: 0 0 12px;
+  font-size: 36px;
+}
+
+#changes-list {
+  margin: 0;
+  padding-left: 30px;
+  display: grid;
+  gap: 8px;
+  font-size: 28px;
+  line-height: 1.5;
+}
+
+.poster-note {
+  margin-top: auto;
+  font-size: 24px;
+  font-weight: 700;
+  color: #334155;
+  padding: 16px 4px 0;
+}
