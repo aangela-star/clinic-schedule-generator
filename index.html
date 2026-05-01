@@ -3,30 +3,63 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>雙院區醫師門診表 HTML 圖片產生器 v1</title>
+    <title>雙院區門診表產生器</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+    <script src="app.js" defer></script>
   </head>
   <body>
-    <div class="controls">
-      <button id="download-btn" type="button">下載 PNG</button>
-    </div>
+    <header class="page-header">
+      <h1>同仁用｜雙院區門診表產生器</h1>
+      <p>直接在此頁輸入資料、即時預覽 1080x1920 海報，並下載 PNG。</p>
+    </header>
 
-    <main id="poster" class="poster" aria-label="雙院區醫師門診表海報">
-      <header class="poster-header">
-        <h1 id="poster-title">載入中...</h1>
-      </header>
+    <main class="layout">
+      <section class="editor" aria-label="資料輸入區">
+        <h2>資料輸入區</h2>
 
-      <section id="clinics-container" class="clinics-container" aria-live="polite"></section>
+        <div class="field-group">
+          <label for="titleInput">標題</label>
+          <input id="titleInput" type="text" />
+        </div>
 
-      <section class="changes-card">
-        <h2>🔺 本週門診異動</h2>
-        <ul id="changes-list"></ul>
+        <div id="clinicsEditor"></div>
+
+        <div class="field-group">
+          <label for="changesInput">本週門診異動（可多行）</label>
+          <textarea id="changesInput" rows="5"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="noteInput">備註（可多行）</label>
+          <textarea id="noteInput" rows="4"></textarea>
+        </div>
+
+        <button id="downloadBtn" type="button">產生圖片 / 下載 PNG</button>
       </section>
 
-      <footer class="poster-note" id="poster-note"></footer>
-    </main>
+      <section class="preview-wrapper" aria-label="海報預覽區">
+        <h2>1080 x 1920 海報預覽</h2>
+        <div class="preview-scale">
+          <article id="poster" class="poster" aria-label="門診表海報">
+            <header class="poster-header">
+              <h3 id="posterTitle"></h3>
+            </header>
 
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-    <script src="app.js" defer></script>
+            <section id="posterClinics" class="poster-clinics"></section>
+
+            <section class="info-card">
+              <h4>本週門診異動</h4>
+              <pre id="posterChanges"></pre>
+            </section>
+
+            <section class="info-card note-card">
+              <h4>備註</h4>
+              <pre id="posterNote"></pre>
+            </section>
+          </article>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
