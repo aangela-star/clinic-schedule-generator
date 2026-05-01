@@ -1,4 +1,3 @@
-// 門診表產生器：所有資料都在前端操作，不需要修改 JSON 或程式碼。
 const days = ["週一", "週二", "週三", "週四", "週五", "週六"];
 const sessions = ["早診", "午診", "晚診"];
 
@@ -49,7 +48,6 @@ const posterNote = document.getElementById("posterNote");
 
 function buildEditor() {
   clinicsEditor.innerHTML = "";
-
   state.clinics.forEach((clinic, clinicIndex) => {
     const wrapper = document.createElement("div");
     wrapper.className = "clinic-editor";
@@ -72,7 +70,6 @@ function buildEditor() {
     sessions.forEach((sessionName, rowIndex) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<th>${sessionName}</th>`;
-
       days.forEach((_, colIndex) => {
         const td = document.createElement("td");
         const input = document.createElement("input");
@@ -84,7 +81,6 @@ function buildEditor() {
         td.appendChild(input);
         tr.appendChild(td);
       });
-
       tbody.appendChild(tr);
     });
 
@@ -107,7 +103,6 @@ function renderPoster() {
   state.clinics.forEach((clinic) => {
     const card = document.createElement("section");
     card.className = "clinic-card";
-
     const h4 = document.createElement("h4");
     h4.textContent = clinic.name || "未命名診所";
 
@@ -115,12 +110,11 @@ function renderPoster() {
     table.className = "poster-table";
     const thead = document.createElement("thead");
     thead.innerHTML = `<tr><th>時段</th>${days.map((d) => `<th>${d}</th>`).join("")}</tr>`;
-
     const tbody = document.createElement("tbody");
+
     sessions.forEach((sessionName, rowIndex) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<th>${sessionName}</th>`;
-
       days.forEach((_, colIndex) => {
         const td = document.createElement("td");
         const value = clinic.schedule[rowIndex][colIndex] || "";
@@ -130,7 +124,6 @@ function renderPoster() {
         td.appendChild(span);
         tr.appendChild(td);
       });
-
       tbody.appendChild(tr);
     });
 
@@ -144,14 +137,12 @@ async function downloadPoster() {
   const poster = document.getElementById("poster");
   downloadBtn.disabled = true;
   downloadBtn.textContent = "產生中...";
-
   try {
     const canvas = await html2canvas(poster, {
       scale: 2,
       useCORS: true,
       backgroundColor: "#ffffff"
     });
-
     const link = document.createElement("a");
     link.download = `${state.title || "門診時段表"}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -167,21 +158,9 @@ function bindTopInputs() {
   changesInput.value = state.changes;
   noteInput.value = state.note;
 
-  titleInput.addEventListener("input", (e) => {
-    state.title = e.target.value;
-    renderPoster();
-  });
-
-  changesInput.addEventListener("input", (e) => {
-    state.changes = e.target.value;
-    renderPoster();
-  });
-
-  noteInput.addEventListener("input", (e) => {
-    state.note = e.target.value;
-    renderPoster();
-  });
-
+  titleInput.addEventListener("input", (e) => { state.title = e.target.value; renderPoster(); });
+  changesInput.addEventListener("input", (e) => { state.changes = e.target.value; renderPoster(); });
+  noteInput.addEventListener("input", (e) => { state.note = e.target.value; renderPoster(); });
   downloadBtn.addEventListener("click", downloadPoster);
 }
 
